@@ -8,7 +8,8 @@ import {accessToken, assetIds} from "./js/CesiumConfig";
 import {fetchApplyBuildingColors} from "./js/FetchApplyBuildingColors";
 import {getAuthToken} from "./js/AuthService";
 import axios from "axios";
-import {startPolygonDrawing} from "./js/DrawingTool";
+import {startPolygonDrawing, clearDrawingArtifacts} from "./js/DrawingTool";
+import { renderPipes, clearPipes } from "./js/PipeRenderer";
 
 Ion.defaultAccessToken = accessToken;
 
@@ -47,6 +48,9 @@ const drawBtn = document.getElementById("drawPolygon");
 if (drawBtn) {
     drawBtn.addEventListener("click", async () => {
         try {
+            // Remove previous pipes and any lingering drawing artifacts before starting a new polygon
+            clearPipes(viewer);
+            clearDrawingArtifacts(viewer);
             // Start interactive drawing
             const ring = await startPolygonDrawing(viewer); // [[lon, lat], ... closed]
 
@@ -59,7 +63,17 @@ if (drawBtn) {
 
             const response = await axios.post(selectConnectionsUrl, { polygon }, { headers });
             console.log("Polygon submitted successfully.", response.data);
-            alert("Selection submitted. Check console for response.");
+
+            // Clear previously drawn pipes and render new ones (clamped to terrain)
+            try {
+                clearPipes(viewer);
+                const stats = await renderPipes(viewer, response.data, { zoom: true, houseRadius: 0.4, mainRadius: 0.6 });
+                console.log(`Rendered pipes: total=${stats?.count} house=${stats?.houseCount} main=${stats?.mainCount}`);
+                alert(`Rendered pipes. House: ${stats?.houseCount ?? 0}, Main: ${stats?.mainCount ?? 0}`);
+            } catch (renderErr) {
+                console.error("Failed to render pipes:", renderErr);
+                alert("Selection submitted, but failed to render pipes. See console.");
+            }
         } catch (err) {
             if (err && err.message === "Drawing canceled") {
                 console.log("Polygon drawing canceled by user.");
