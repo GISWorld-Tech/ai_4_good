@@ -3,13 +3,13 @@ import "bootstrap/dist/js/bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./css/main.css";
 import "cesium/Build/Cesium/Widgets/widgets.css";
-import {Cesium3DTileset, createWorldTerrainAsync, Ion, Viewer, ScreenSpaceEventType} from "cesium";
+import {Cesium3DTileset, createWorldTerrainAsync, Ion, Viewer} from "cesium";
 import {accessToken, assetIds} from "./js/CesiumConfig";
 import {fetchApplyBuildingColors} from "./js/FetchApplyBuildingColors";
 import {getAuthToken} from "./js/AuthService";
 import axios from "axios";
-import {startPolygonDrawing, clearDrawingArtifacts} from "./js/DrawingTool";
-import { renderPipes, clearPipes } from "./js/PipeRenderer";
+import {clearDrawingArtifacts, startPolygonDrawing} from "./js/DrawingTool";
+import {clearPipes, renderPipes} from "./js/PipeRenderer";
 
 Ion.defaultAccessToken = accessToken;
 
@@ -48,26 +48,23 @@ const drawBtn = document.getElementById("drawPolygon");
 if (drawBtn) {
     drawBtn.addEventListener("click", async () => {
         try {
-            // Remove previous pipes and any lingering drawing artifacts before starting a new polygon
             clearPipes(viewer);
             clearDrawingArtifacts(viewer);
-            // Start interactive drawing
-            const ring = await startPolygonDrawing(viewer); // [[lon, lat], ... closed]
+            const ring = await startPolygonDrawing(viewer);
 
             const polygon = {
                 type: "Polygon",
                 coordinates: [ring],
             };
 
-            const headers = authToken ? { Authorization: `Bearer ${authToken}` } : {};
+            const headers = authToken ? {Authorization: `Bearer ${authToken}`} : {};
 
-            const response = await axios.post(selectConnectionsUrl, { polygon }, { headers });
+            const response = await axios.post(selectConnectionsUrl, {polygon}, {headers});
             console.log("Polygon submitted successfully.", response.data);
 
-            // Clear previously drawn pipes and render new ones (clamped to terrain)
             try {
                 clearPipes(viewer);
-                const stats = await renderPipes(viewer, response.data, { zoom: true, houseRadius: 0.4, mainRadius: 0.6 });
+                const stats = await renderPipes(viewer, response.data, {zoom: true, houseRadius: 0.4, mainRadius: 0.6});
                 console.log(`Rendered pipes: total=${stats?.count} house=${stats?.houseCount} main=${stats?.mainCount}`);
                 alert(`Rendered pipes. House: ${stats?.houseCount ?? 0}, Main: ${stats?.mainCount ?? 0}`);
             } catch (renderErr) {
