@@ -2,3 +2,7 @@
 */.idea
 */node_modules
 */dist
+data/alkis/*
+!data/alkis/*.zip
+data/citygml/*
+!data/citygml/*.zip
