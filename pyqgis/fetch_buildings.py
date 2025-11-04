@@ -5,6 +5,16 @@ from qgis.core import (
     QgsGeometry, QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 )
 
+COMMUNITY_ID = "08417008"
+BASE_URL = "https://backend.gisworld-tech.com"
+TOKEN_URL = f"{BASE_URL}/api/token/"
+DATA_URL = f"{BASE_URL}/geospatial/communities/{COMMUNITY_ID}/buildings/"
+USERNAME = "guest"
+PASSWORD = "guest20252025"
+
+VERIFY_SSL = False
+TIMEOUT = 30
+
 
 def coords_to_geom(coords):
     coordinates = []
@@ -14,16 +24,6 @@ def coords_to_geom(coords):
 
 
 if __name__ == '__console__':
-    COMMUNITY_ID = "08417008"
-    BASE_URL = "https://backend.gisworld-tech.com"
-    TOKEN_URL = f"{BASE_URL}/api/token/"
-    DATA_URL = f"{BASE_URL}/geospatial/communities/{COMMUNITY_ID}/buildings/"
-    USERNAME = "guest"
-    PASSWORD = "guest20252025"
-
-    VERIFY_SSL = False
-    TIMEOUT = 30
-
     # Get token
     r = requests.post(
         TOKEN_URL,
