@@ -5,7 +5,8 @@ from qgis.core import (
     QgsGeometry, QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 )
 
-COMMUNITY_ID = "08417008"
+# COMMUNITY_ID = "08417008"
+COMMUNITY_ID = "08226054"
 BASE_URL = "https://backend.gisworld-tech.com"
 TOKEN_URL = f"{BASE_URL}/api/token/"
 DATA_URL = f"{BASE_URL}/geospatial/communities/{COMMUNITY_ID}/buildings/"
